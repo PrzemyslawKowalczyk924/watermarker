@@ -1,0 +1,14 @@
+.vscode
+
+# Logs
+logs
+*.log
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Yarn Integrity file
+.yarn-integrity

@@ -1,0 +1,11 @@
+{
+  "name": "watermarker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/PrzemyslawKowalczyk924/watermarker.git",
+  "author": "<kowalczyk.przemek@wp.pl>",
+  "license": "MIT",
+  "dependencies": {
+    "jimp": "0.6.4"
+  }
+}
