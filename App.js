@@ -1,6 +1,6 @@
 const Jimp = require('jimp');
 const inquirer = require('inquirer');
-import { existsSync } from 'fs';
+const fs = require('fs');
 
 const addTextWatermarkToImage = async function(inputFile, outputFile, text) {
   const image = await Jimp.read(inputFile);
@@ -56,6 +56,8 @@ const startApp = async () => {
     choices: ['Text watermark', 'Image watermark'],
   }]);
 
+  const fileExists = fs.existsSync('./img/' + options.inputImage);
+
   if(options.watermarkType === 'Text watermark') {
     const text = await inquirer.prompt([{
       name: 'value',
@@ -63,7 +65,12 @@ const startApp = async () => {
       message: 'Type your watermark text:',
     }]);
     options.watermarkText = text.value;
-    addTextWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), options.watermarkText);
+    
+    if (fileExists) {
+      addTextWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), options.watermarkText);
+    } else {
+      console.log(`The file ${options.inputImage} dont exist!`);
+    };
   }
   else {
     const image = await inquirer.prompt([{
@@ -73,7 +80,12 @@ const startApp = async () => {
       default: 'logo.png',
     }]);
     options.watermarkImage = image.filename;
-    addImageWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), './img/' + options.watermarkImage);
+    if (fileExists && fs.existsSync('./img/' + options.watermarkImage)) {
+      console.log('dybie!');
+      addImageWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), './img/' + options.watermarkImage);
+    } else {
+      console.log('nie dybie!');
+    }
   }
 
 }
