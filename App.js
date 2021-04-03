@@ -67,6 +67,7 @@ const startApp = async () => {
     options.watermarkText = text.value;
     
     if (fileExists) {
+      console.log('Text Watermark done!');
       addTextWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), options.watermarkText);
     } else {
       console.log(`The file ${options.inputImage} dont exist!`);
@@ -81,13 +82,14 @@ const startApp = async () => {
     }]);
     options.watermarkImage = image.filename;
     if (fileExists && fs.existsSync('./img/' + options.watermarkImage)) {
-      console.log('dybie!');
+      console.log('Image Watermark done!');
       addImageWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), './img/' + options.watermarkImage);
     } else {
-      console.log('nie dybie!');
+      console.log('Something went wrong... Try again!');
     }
   }
 
+  startApp();
 }
 
 startApp();
