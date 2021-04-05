@@ -59,7 +59,6 @@ const makeImageContrast = async function(inputFile, outputFile, contrast) {
   
   await img.quality(100).writeAsync(outputFile);
   console.log('Image with adjusted contrast successfully created!');
-
 }
 
 const startApp = async () => {
@@ -151,6 +150,7 @@ const startApp = async () => {
       startApp();
     } else {
       console.log(`The file ${options.inputImage} dont exist!`);
+      startApp();
     };
   }
   else {
@@ -164,8 +164,10 @@ const startApp = async () => {
     if (fileExists && fs.existsSync('./img/' + options.watermarkImage)) {
       addImageWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), './img/' + options.watermarkImage);
       console.log('Image Watermark done!');
+      startApp();
     } else {
       console.log('Something went wrong... Try again!');
+      startApp();
     }
   }
 }
