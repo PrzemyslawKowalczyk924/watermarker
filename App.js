@@ -40,6 +40,28 @@ const prepareOutputFilename = (filename) => {
   return `${name}-with-watermark.${ext}`;
 };
 
+const prepareOutputFilenameIfEdited = (filename) => {
+  const [ name, ext ] = filename.split('.');
+  return `${name}-edited.${ext}`;
+};
+
+const makeImageBrighter = async function(inputFile, outputFile, brightness) {
+  const img = await Jimp.read(inputFile);
+  img.brightness(Number(brightness.value));
+  
+  await img.quality(100).writeAsync(outputFile);
+  console.log('Image with adjusted brightness successfully created!');
+}
+
+const makeImageContrast = async function(inputFile, outputFile, contrast) {
+  const img = await Jimp.read(inputFile);
+  img.contrast(Number(contrast.value));
+  
+  await img.quality(100).writeAsync(outputFile);
+  console.log('Image with adjusted contrast successfully created!');
+
+}
+
 const startApp = async () => {
 
   // Ask if user is ready
@@ -65,6 +87,55 @@ const startApp = async () => {
   }]);
 
   const fileExists = fs.existsSync('./img/' + options.inputImage);
+
+  const askUser = await inquirer.prompt([{
+    name: 'edit',
+    message: 'Would you like to edit image before adding a watermark?',
+    type: 'confirm'
+  }]);
+
+  if(askUser.edit) {
+    const listofEditChoices = await inquirer.prompt([{
+      name: 'editName',
+      message: 'What would you like to do?',
+      type: 'list',
+      choices: ['make image brighter', 'increase contrast', 'make image b&w', 'invert image', 'exit']
+    }
+  ])
+
+    switch (listofEditChoices.editName) {
+      case 'make image brighter':
+        const brightness = await inquirer.prompt([{
+          name: 'value',
+          type: 'input',
+          message: 'adjust the brightness by a value -1 to +1 for example (.4) or (-.2)',
+          //default: 0.5,
+        }]);
+        makeImageBrighter('./img/' + options.inputImage, prepareOutputFilenameIfEdited(options.inputImage), brightness);
+        break;
+      case 'increase contrast':
+        const contrast = await inquirer.prompt([{
+          name: 'value',
+          type: 'input',
+          message: 'adjust the contrast by a value -1 to +1 for example (.4) or (-.2)',
+          //default: 0.5,
+        }]);
+        makeImageContrast('./img/' + options.inputImage, prepareOutputFilenameIfEdited(options.inputImage), contrast);
+        break;
+      case 'make image b&w':
+        console.log('make image b&w');
+        break;
+      case 'invert image':
+        console.log('invert image');
+        break;
+      case 'exit':
+        break;      
+      default:
+        console.log('Something went wrong');
+    }
+
+  }
+  
 
   if(options.watermarkType === 'Text watermark') {
     const text = await inquirer.prompt([{
@@ -93,7 +164,6 @@ const startApp = async () => {
     if (fileExists && fs.existsSync('./img/' + options.watermarkImage)) {
       addImageWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), './img/' + options.watermarkImage);
       console.log('Image Watermark done!');
-      startApp();
     } else {
       console.log('Something went wrong... Try again!');
     }
