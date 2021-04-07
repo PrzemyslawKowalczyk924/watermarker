@@ -37,12 +37,7 @@ const addImageWatermarkToImage = async function(inputFile, outputFile, watermark
 
 const prepareOutputFilename = (filename) => {
   const [ name, ext ] = filename.split('.');
-  return `${name}-with-watermark.${ext}`;
-};
-
-const prepareOutputFilenameIfEdited = (filename) => {
-  const [ name, ext ] = filename.split('.');
-  return `${name}-edited.${ext}`;
+  return `${name}-with-edited.${ext}`;
 };
 
 const makeImageBrighter = async function(inputFile, outputFile, brightness) {
@@ -110,7 +105,7 @@ const startApp = async () => {
           message: 'adjust the brightness by a value -1 to +1 for example (.4) or (-.2)',
           //default: 0.5,
         }]);
-        makeImageBrighter('./img/' + options.inputImage, prepareOutputFilenameIfEdited(options.inputImage), brightness);
+        makeImageBrighter('./img/' + options.inputImage, prepareOutputFilename(options.inputImage), brightness);
         break;
       case 'increase contrast':
         const contrast = await inquirer.prompt([{
@@ -119,7 +114,7 @@ const startApp = async () => {
           message: 'adjust the contrast by a value -1 to +1 for example (.4) or (-.2)',
           //default: 0.5,
         }]);
-        makeImageContrast('./img/' + options.inputImage, prepareOutputFilenameIfEdited(options.inputImage), contrast);
+        makeImageContrast('./img/' + options.inputImage, prepareOutputFilename(options.inputImage), contrast);
         break;
       case 'make image b&w':
         console.log('make image b&w');
@@ -135,6 +130,7 @@ const startApp = async () => {
 
   }
   
+  const inputFile = askUser.edit ? prepareOutputFilename(options.inputImage) : options.inputImage;
 
   if(options.watermarkType === 'Text watermark') {
     const text = await inquirer.prompt([{
@@ -145,7 +141,7 @@ const startApp = async () => {
     options.watermarkText = text.value;
     
     if (fileExists) {
-      addTextWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), options.watermarkText);
+      addTextWatermarkToImage(inputFile, './img/' + prepareOutputFilename(options.inputImage), options.watermarkText);
       console.log('Text Watermark done!');
       startApp();
     } else {
@@ -162,7 +158,7 @@ const startApp = async () => {
     }]);
     options.watermarkImage = image.filename;
     if (fileExists && fs.existsSync('./img/' + options.watermarkImage)) {
-      addImageWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), './img/' + options.watermarkImage);
+      addImageWatermarkToImage(inputFile, './img/' + prepareOutputFilename(options.inputImage), './img/' + options.watermarkImage);
       console.log('Image Watermark done!');
       startApp();
     } else {
